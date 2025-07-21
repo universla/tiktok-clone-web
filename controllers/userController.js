@@ -1,18 +1,17 @@
-const User = require("../models/User");
-const Video = require("../models/Video");
 
-exports.getFeed = async (req, res) => {
-  const { userId } = req.query;
+exports.followUser = async (req, res) => {
+  const { followerId, followingId } = req.body;
 
   try {
-    const user = await User.findById(userId).populate("following");
-    const followingIds = user.following.map((u) => u._id);
+    await User.findByIdAndUpdate(followerId, {
+      $addToSet: { following: followingId },
+    });
 
-    const videos = await Video.find({ user: { $in: followingIds } })
-      .populate("user")
-      .sort({ createdAt: -1 });
+    await User.findByIdAndUpdate(followingId, {
+      $addToSet: { followers: followerId },
+    });
 
-    res.json(videos);
+    res.json({ msg: "Follow actualizado" });
   } catch (error) {
     res.status(500).json({ error });
   }
