@@ -1,22 +1,23 @@
 
 const express = require("express");
 const path = require("path");
+const connectDB = require("./config/db");
+const authRoutes = require("./routes/auth");
+const videoRoutes = require("./routes/video");
+const userRoutes = require("./routes/user");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Servir archivos estáticos
+connectDB();
+
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// API de ejemplo para traer videos
-app.get("/api/videos", (req, res) => {
-  res.json([
-    { id: 1, url: "https://www.w3schools.com/html/mov_bbb.mp4 ", user: "Usuario1" },
-    { id: 2, url: "https://www.w3schools.com/html/movie.mp4 ", user: "Usuario2" }
-  ]);
-});
+app.use("/api/auth", authRoutes);
+app.use("/api/video", videoRoutes);
+app.use("/api/user", userRoutes);
 
-// Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
